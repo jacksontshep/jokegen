@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Joke Generator</title>
+  <style>
+    table {
+      border-collapse: collapse;
+      margin: 10px 0;
+      display: inline-block;
+      margin-right: 10px;
+    }
+  </style>
+</head>
+<body>
+    <h1>Joke Generator</h1>
+    <label for="topic"> Topic:</label>
+    <input type="text" id="topic" maxlength="20" placeholder="programming">
+    <button id="generate-joke" disabled>Generate Joke</button>
+    <br>
+    <label for="joke"> Joke:</label>
+    <pre id="joke"></pre>
+    <label for="punchline"> Punchline:</label>
+    <pre id="punchline"></pre>
+    <script>
+        let socket;
+        let reconnectInterval = 1000;
+        let automaticInterval;
+    
+        function connectWebSocket() {
+          console.log('Attempting to connect to WebSocket')
+          socket = new WebSocket(`ws://${window.location.hostname}:2999/ws`)
+    
+          socket.onopen = () => {
+            console.log('WebSocket connection established')
+            document.getElementById('generate-joke').disabled = false
+            reconnectInterval = 1000; // Reset the reconnect interval on successful connection
+          }
+    
+          socket.onmessage = event => {
+            console.log('Received message:', event.data)
+            const {joke, punchline} = JSON.parse(event.data)
+            displayJoke({ joke, punchline })
+          }
+    
+          socket.onerror = error => {
+            console.error('WebSocket error:', error)
+          }
+    
+          socket.onclose = () => {
+            console.log('WebSocket connection closed')
+            document.getElementById('generate-joke').disabled = true
+            setTimeout(connectWebSocket, reconnectInterval)
+            reconnectInterval = Math.min(reconnectInterval * 2, 30000) // Exponential backoff, up to 30 seconds
+          }
+        }
+    
+        document.getElementById('generate-joke').onclick = () => {
+          const topic = document.getElementById('topic').value.trim()
+          if (!topic) return
+          if (socket.readyState === WebSocket.OPEN) {
+            console.log('Sending message: generate joke')
+            socket.send(JSON.stringify({ command: 'generate joke', topic }))
+          } else {
+            console.log('WebSocket not open:', socket.readyState)
+          }
+        }
+
+        function displayJoke({ joke, punchline }) {
+            document.getElementById('joke').textContent = joke
+            document.getElementById('punchline').textContent = punchline
+        }
+    
+        connectWebSocket();
+      </script>
+    </body>
+    </html>

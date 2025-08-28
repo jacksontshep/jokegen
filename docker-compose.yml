@@ -1,0 +1,10 @@
+services:
+  jokegen:
+    build: .
+    container_name: jokegen
+    ports:
+      - "2999:2999"
+    environment:
+      # Provide your OpenAI key via an env file or directly here
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+    restart: unless-stopped

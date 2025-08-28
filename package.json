@@ -1,0 +1,27 @@
+{
+  "name": "jokegen",
+  "version": "1.0.0",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "standard",
+    "lint:fix": "standard --fix"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "Joke generator",
+  "devDependencies": {
+    "standard": "^17.1.2"
+  },
+  "dependencies": {
+    "@langchain/core": "^0.3.72",
+    "@langchain/openai": "^0.6.9",
+    "langchain": "^0.3.31",
+    "express": "^4.18.2",
+    "ws": "^8.15.1",
+    "zod": "^3.22.4"
+  }
+}
